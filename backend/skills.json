@@ -1,0 +1,23 @@
+{
+  "programming_languages": [
+    "Python", "Java", "C++", "C#", "JavaScript", "TypeScript", "Go", "Ruby", "PHP", "R", "Swift", "Kotlin", "Scala", "Perl", "Objective-C"
+  ],
+  "frameworks_libraries": [
+    "React", "Angular", "Vue", "Next.js", "Django", "Flask", "FastAPI", "Spring", "Express", "TensorFlow", "PyTorch", "Scikit-learn", "Keras", "Bootstrap", "Tailwind", "jQuery", "Node.js"
+  ],
+  "databases": [
+    "MySQL", "PostgreSQL", "MongoDB", "SQLite", "Oracle", "Redis", "Cassandra", "MariaDB", "Elasticsearch", "DynamoDB"
+  ],
+  "cloud_devops": [
+    "AWS", "Azure", "Google Cloud", "Docker", "Kubernetes", "Jenkins", "Terraform", "Ansible", "Heroku", "Netlify", "Vercel"
+  ],
+  "tools": [
+    "Git", "GitHub", "GitLab", "Bitbucket", "Jira", "Trello", "Figma", "Canva", "Photoshop", "Illustrator", "Postman", "Linux", "Bash", "PowerShell"
+  ],
+  "data_science": [
+    "Pandas", "NumPy", "Matplotlib", "Seaborn", "NLTK", "Spacy", "OpenCV", "Tableau", "Power BI", "Excel"
+  ],
+  "soft_skills": [
+    "Leadership", "Communication", "Problem Solving", "Critical Thinking", "Teamwork", "Adaptability", "Creativity", "Time Management", "Collaboration", "Decision Making"
+  ]
+}
