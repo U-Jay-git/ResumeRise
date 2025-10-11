@@ -6,10 +6,12 @@ from matcher import compare_resume_job, load_skills
 
 
 app = FastAPI()
+app = FastAPI()
 
 # Allow frontend (React) to call backend
 app.add_middleware(
     CORSMiddleware,
+    allow_origins=["*"],
     allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
