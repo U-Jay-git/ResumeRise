@@ -1,35 +1,33 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
+from fastapi import FastAPI, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
-from matcher import load_skills, compare_resume_job
+import pdfplumber
+import io
+from matcher import compare_resume_job, load_skills
 
-# Initialize FastAPI
-app = FastAPI(title="ResumeRise - Skill Matcher API")
 
+app = FastAPI()
+
+# Allow frontend (React) to call backend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # allow all origins (for dev)
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Load skills once (not every request)
-skills_dict = load_skills()
+@app.post("/upload-resume")
+async def upload_resume(resume_file: UploadFile, job_text: str = Form(...)):
+    if resume_file.content_type != "application/pdf":
+        return {"error": "Only PDF files allowed"}
 
-# Input schema
-class InputData(BaseModel):
-    resume_text: str
-    job_text: str
+    content = await resume_file.read()
+    text = ""
+    with pdfplumber.open(io.BytesIO(content)) as pdf:
+        for page in pdf.pages:
+            text += page.extract_text() or ""
 
-@app.get("/")
-def home():
-    return {"message": "Welcome to ResumeRise Skill Matcher API 🚀"}
-
-@app.post("/match-skills")
-def match_skills(data: InputData):
-    """
-    Compare resume and job description, return matched and missing skills
-    """
-    result = compare_resume_job(data.resume_text, data.job_text, skills_dict)
+    # Load skills.json each time (or cache it globally)
+    skills_dict = load_skills()
+    result = compare_resume_job(text, job_text, skills_dict)
     return result
