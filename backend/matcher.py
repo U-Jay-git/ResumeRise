@@ -1,6 +1,25 @@
 import json
 import pandas as pd
 
+# ==========================
+# HUGGING FACE MODEL INTEGRATION
+# ==========================
+from hf_model import HFResumeMatcher
+
+# Initialize Hugging Face matcher once
+hf_matcher = HFResumeMatcher()
+
+
+def get_resume_score(resume_text, job_description):
+    """
+    Returns score, matching_analysis, recommendation from HF model
+    """
+    result = hf_matcher.predict(resume_text, job_description)
+    score = result.get("score", None)
+    analysis = result.get("matching_analysis", "")
+    recommendation = result.get("recommendation", "")
+    return score, analysis, recommendation
+
 
 # ==========================
 # JSON-BASED SKILL MATCHING
@@ -120,6 +139,15 @@ if __name__ == "__main__":
     job_text = "Looking for a developer skilled in Python, Django, React, PostgreSQL, AWS, Docker and Kubernetes."
     print("\n=== JSON-BASED TEST ===")
     print(compare_resume_job(resume_text, job_text, skills_dict))
+
+    # HF model test
+    print("\n=== HUGGING FACE MODEL TEST ===")
+    score, analysis, recommendation = get_resume_score(resume_text, job_text)
+    print({
+        "score": score,
+        "matching_analysis": analysis,
+        "recommendation": recommendation
+    })
 
     # Dataset-based test
     print("\n=== DATASET TEST ===")

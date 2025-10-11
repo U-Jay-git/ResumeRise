@@ -49,7 +49,7 @@ function ResumeMatchPage() {
 
       {/* Main */}
       <main className="container mx-auto px-6 py-10 flex-1">
-        {/* Upload Form Card */}
+        {/* Upload Form */}
         <div className="bg-[#0f172a] p-10 rounded-3xl shadow-2xl mb-10 max-w-5xl mx-auto hover:shadow-[#fcd34d]/40 transition transform hover:-translate-y-1">
           <h2 className="text-3xl font-bold mb-6 text-[#22c55e]">Upload Resume & Job Description</h2>
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -85,35 +85,44 @@ function ResumeMatchPage() {
           </form>
         </div>
 
-        {/* Results Section Card */}
+        {/* Results Section */}
         {result && (
           <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-8">
             {/* Scores Card */}
             <div className="bg-[#0f172a] p-8 rounded-3xl shadow-2xl hover:shadow-[#2563eb]/40 transition transform hover:-translate-y-1">
               <h3 className="text-2xl font-bold mb-6 text-[#22c55e]">📊 Match Scores</h3>
               <div className="space-y-6">
+                {/* Rule-based overlap */}
                 <div>
                   <p className="text-gray-300 mb-2 font-semibold">Match Score (Overlap):</p>
                   <div className="w-full bg-gray-700 rounded-full h-8 overflow-hidden">
                     <div
                       className="bg-[#2563eb] h-8 text-black text-center font-bold transition-all duration-500"
-                      style={{ width: `${result.match_score_overlap}%` }}
+                      style={{ width: `${result.rule_overlap_score}%` }}
                     >
-                      {result.match_score_overlap}%
+                      {result.rule_overlap_score}%
                     </div>
                   </div>
                 </div>
+
+                {/* Hugging Face model score */}
                 <div>
                   <p className="text-gray-300 mb-2 font-semibold">AI Model Score:</p>
                   <div className="w-full bg-gray-700 rounded-full h-8 overflow-hidden">
                     <div
                       className="bg-[#7c3aed] h-8 text-black text-center font-bold transition-all duration-500"
-                      style={{ width: `${result.match_score_model}%` }}
+                      style={{ width: `${result.hf_score || 0}%` }}
                     >
-                      {result.match_score_model.toFixed(2)}
+                      {result.hf_score != null ? result.hf_score.toFixed(2) : "0.00"}%
                     </div>
                   </div>
                 </div>
+              </div>
+
+              {/* HF analysis & recommendation */}
+              <div className="mt-6 text-gray-300">
+                <p><strong>Analysis:</strong> {result.matching_analysis || "N/A"}</p>
+                <p><strong>Recommendation:</strong> {result.recommendation || "N/A"}</p>
               </div>
             </div>
 
