@@ -26,6 +26,7 @@ export default function HomePage() {
           <a href="#home" className="hover:text-[#fcd34d] transition">Home</a>
           <a href="#purpose" className="hover:text-[#fcd34d] transition">Purpose</a>
           <a href="#about" className="hover:text-[#fcd34d] transition">About</a>
+          <Link to="/resume-builder" className="hover:text-[#fcd34d] transition">Create Resume</Link>
         </nav>
         <div className="w-10 h-10 bg-[#22c55e] rounded-full border-2 border-[#fcd34d]" />
       </header>
@@ -38,7 +39,7 @@ export default function HomePage() {
         <p className="text-lg md:text-2xl text-gray-300 mb-8 max-w-3xl animate-fade-in delay-200">
           AI-powered Resume Matching & Mock Interviews. Discover your strengths, improve your skills, and land your dream job faster.
         </p>
-        <div className="flex space-x-6 animate-fade-in delay-400">
+        <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6 animate-fade-in delay-400">
           <Link to="/resume-match">
             <button className="bg-[#2563eb] hover:bg-[#fcd34d] text-xl px-8 py-4 rounded-lg shadow-xl hover:shadow-[#fcd34d]/50 transition duration-300 transform hover:-translate-y-1">
               Resume Match
@@ -49,13 +50,18 @@ export default function HomePage() {
               Mock Interviews
             </button>
           </Link>
+          <Link to="/resume-builder">
+            <button className="bg-[#22c55e] hover:bg-[#fcd34d] text-xl px-8 py-4 rounded-lg shadow-xl hover:shadow-[#fcd34d]/50 transition duration-300 transform hover:-translate-y-1">
+              Create Resume
+            </button>
+          </Link>
         </div>
       </section>
 
       {/* Purpose Section */}
       <section id="purpose" className="px-10 py-20 bg-[#1e293b]">
         <h3 className="text-4xl font-bold mb-12 text-center text-[#22c55e]">Choose Your Purpose</h3>
-        <div className="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-12 max-w-6xl mx-auto">
           {/* Resume Matching Card */}
           <div className="bg-[#0f172a] p-10 rounded-2xl shadow-lg hover:shadow-[#fcd34d]/40 transition transform hover:scale-105 relative overflow-hidden">
             <h4 className="text-3xl font-bold mb-4 text-[#2563eb]">📄 Resume Matching</h4>
@@ -82,6 +88,20 @@ export default function HomePage() {
               </button>
             </Link>
             <div className="absolute bottom-0 left-0 w-40 h-40 bg-[#7c3aed]/20 rounded-full blur-3xl" />
+          </div>
+
+          {/* Resume Builder Card */}
+          <div className="bg-[#0f172a] p-10 rounded-2xl shadow-lg hover:shadow-[#fcd34d]/40 transition transform hover:scale-105 relative overflow-hidden">
+            <h4 className="text-3xl font-bold mb-4 text-[#22c55e]">📝 Create Resume</h4>
+            <p className="text-gray-300 mb-8 text-lg">
+              Build a professional resume quickly using our AI-powered templates. Preview and download instantly as PDF.
+            </p>
+            <Link to="/resume-builder">
+              <button className="bg-[#22c55e] hover:bg-[#fcd34d] w-full py-3 text-lg rounded-lg shadow-md transition duration-200">
+                Build Resume
+              </button>
+            </Link>
+            <div className="absolute top-0 left-0 w-40 h-40 bg-[#22c55e]/20 rounded-full blur-3xl" />
           </div>
         </div>
       </section>
