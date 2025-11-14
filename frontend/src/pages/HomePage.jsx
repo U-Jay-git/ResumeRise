@@ -45,7 +45,8 @@ export default function HomePage() {
               Resume Match
             </button>
           </Link>
-          <Link to="/mock-interview">
+          {/* Changed navigation to go to the setup page */}
+          <Link to="/interview-setup">
             <button className="bg-[#7c3aed] hover:bg-[#fcd34d] text-xl px-8 py-4 rounded-lg shadow-xl hover:shadow-[#fcd34d]/50 transition duration-300 transform hover:-translate-y-1">
               Mock Interviews
             </button>
@@ -82,7 +83,8 @@ export default function HomePage() {
             <p className="text-gray-300 mb-8 text-lg">
               Practice with AI-driven interviews and get instant feedback on confidence, tone, and clarity.
             </p>
-            <Link to="/mock-interview">
+            {/* Changed navigation to go to the setup page */}
+            <Link to="/interview-setup">
               <button className="bg-[#7c3aed] hover:bg-[#fcd34d] w-full py-3 text-lg rounded-lg shadow-md transition duration-200">
                 Start Interview
               </button>
