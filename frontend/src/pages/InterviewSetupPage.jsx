@@ -49,7 +49,7 @@ export default function App() {
         try {
             // 3. Make the actual API call using axios
             // Now using the explicit base URL from axios.defaults.baseURL
-            const response = await axios.post("start-interview", formData, {
+            const response = await axios.post("/start-interview", formData, {
                 headers: {
                     // Set Content-Type to undefined to let the browser/axios 
                     // automatically set the boundary for multipart/form-data.
