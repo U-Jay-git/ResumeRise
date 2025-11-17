@@ -26,7 +26,7 @@ export default function HomePage() {
           <a href="#home" className="hover:text-[#fcd34d] transition">Home</a>
           <a href="#purpose" className="hover:text-[#fcd34d] transition">Purpose</a>
           <a href="#about" className="hover:text-[#fcd34d] transition">About</a>
-          <Link to="/resume-builder" className="hover:text-[#fcd34d] transition">Create Resume</Link>
+          {/*<Link to="/resume-builder" className="hover:text-[#fcd34d] transition">Create Resume</Link>*/}
         </nav>
         <div className="w-10 h-10 bg-[#22c55e] rounded-full border-2 border-[#fcd34d]" />
       </header>
@@ -51,11 +51,12 @@ export default function HomePage() {
               Mock Interviews
             </button>
           </Link>
-          <Link to="/resume-builder">
+          {/*<Link to="/resume-builder">
             <button className="bg-[#22c55e] hover:bg-[#fcd34d] text-xl px-8 py-4 rounded-lg shadow-xl hover:shadow-[#fcd34d]/50 transition duration-300 transform hover:-translate-y-1">
               Create Resume
             </button>
-          </Link>
+          </Link>*/}
+          
         </div>
       </section>
 
@@ -92,7 +93,7 @@ export default function HomePage() {
             <div className="absolute bottom-0 left-0 w-40 h-40 bg-[#7c3aed]/20 rounded-full blur-3xl" />
           </div>
 
-          {/* Resume Builder Card */}
+          {/* Resume Builder Card*/} 
           <div className="bg-[#0f172a] p-10 rounded-2xl shadow-lg hover:shadow-[#fcd34d]/40 transition transform hover:scale-105 relative overflow-hidden">
             <h4 className="text-3xl font-bold mb-4 text-[#22c55e]">📝 Create Resume</h4>
             <p className="text-gray-300 mb-8 text-lg">
@@ -140,5 +141,6 @@ export default function HomePage() {
         `}
       </style>
     </div>
+
   );
 }
