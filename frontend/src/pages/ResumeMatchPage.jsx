@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
+// Use environment variable for API URL, fallback to localhost for development
+const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+
 export default function ResumeMatcherPage() {
     const [resumeFile, setResumeFile] = useState(null);
     const [jobDescription, setJobDescription] = useState("");
@@ -38,7 +41,7 @@ export default function ResumeMatcherPage() {
 
         try {
             const response = await axios.post(
-                "http://localhost:8000/match-resume-ml",
+                `${API_BASE_URL}/match-resume-ml`,
                 formData,
                 { headers: { "Content-Type": "multipart/form-data" } }
             );
