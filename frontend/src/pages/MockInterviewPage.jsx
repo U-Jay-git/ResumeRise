@@ -2,6 +2,9 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 
+// Use environment variable for API URL, fallback to localhost for development
+const API_BASE_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
+
 export default function MockInterviewPage() {
     const navigate = useNavigate();
     const location = useLocation();
@@ -34,7 +37,6 @@ export default function MockInterviewPage() {
 
     // Constants
     const MAX_QUESTIONS = 5;
-    const API_BASE_URL = "http://127.0.0.1:8000";
     const FRAME_CAPTURE_INTERVAL = 5000;
 
     // Load Interview Configuration

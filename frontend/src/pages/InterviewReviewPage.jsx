@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 
+// Use environment variable for API URL, fallback to localhost for development
+const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+
 export default function InterviewReviewPage() {
     const location = useLocation();
     const navigate = useNavigate();
@@ -33,7 +36,7 @@ export default function InterviewReviewPage() {
 
             try {
                 const res = await axios.post(
-                    "http://localhost:8000/generate-final-feedback",
+                    `${API_BASE_URL}/generate-final-feedback`,
                     payload
                 );
                 setFinalFeedback(res.data);

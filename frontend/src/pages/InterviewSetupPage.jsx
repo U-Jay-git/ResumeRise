@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
-// IMPORTANT: Set FastAPI backend URL
-axios.defaults.baseURL = "http://localhost:8000/";
+// IMPORTANT: Set FastAPI backend URL - change to your Render URL
+const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
 
 export default function App() {
     const [resumeFile, setResumeFile] = useState(null);
@@ -38,9 +38,9 @@ export default function App() {
         formData.append("interview_type", interviewType);
 
         try {
-            const response = await axios.post("/start-interview", formData, {
+            const response = await axios.post(`${API_BASE_URL}/start-interview`, formData, {
                 headers: {
-                    "Content-Type": undefined,
+                    "Content-Type": "multipart/form-data",
                 },
             });
 
@@ -75,7 +75,7 @@ export default function App() {
             if (err.response?.data?.detail) {
                 errorMessage = err.response.data.detail;
             } else if (err.request) {
-                errorMessage = "Cannot connect to backend at port 8000.";
+                errorMessage = "Cannot connect to backend. Please make sure the server is running.";
             } else {
                 errorMessage = err.message;
             }
