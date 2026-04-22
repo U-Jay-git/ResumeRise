@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-groq_client = groq(api_key=os.getenv("GROQ_API_KEY"))
+groq_client = groq.Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 app = FastAPI(title="ResumeRise API")
 
