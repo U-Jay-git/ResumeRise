@@ -16,7 +16,7 @@ load_dotenv()
 
 groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-app = FastAPI(title="ResumeRise Mock Interview API")
+app = FastAPI(title="ResumeRise API")
 
 app.add_middleware(
     CORSMiddleware,
@@ -394,7 +394,7 @@ Return JSON:
         })
 
 # =============================
-# SIMPLE RESUME MATCHER (No ML dependencies)
+# DYNAMIC RESUME MATCHER (100% Groq-powered)
 # =============================
 
 @app.post("/match-resume-ml")
@@ -402,12 +402,13 @@ async def match_resume_ml(
     resume: UploadFile = File(...),
     job_description: str = Form(...)
 ):
-    """Simple keyword-based resume matcher (no heavy dependencies)"""
+    """Dynamic resume matcher - extracts skills directly from job description using Groq"""
     
     try:
         import PyPDF2
         import io
         
+        # Extract text from PDF
         pdf_bytes = await resume.read()
         pdf_reader = PyPDF2.PdfReader(io.BytesIO(pdf_bytes))
         resume_text = ""
@@ -419,45 +420,175 @@ async def match_resume_ml(
         if not resume_text.strip():
             raise HTTPException(status_code=400, detail="Could not extract text from PDF")
         
-        # Simple keyword matching
-        resume_lower = resume_text.lower()
-        job_lower = job_description.lower()
+        # ============================================================
+        # STEP 1: Extract skills from Job Description using Groq
+        # ============================================================
         
-        common_skills = [
-            "python", "java", "javascript", "react", "angular", "vue", "node",
-            "django", "flask", "fastapi", "spring", "aws", "docker", "kubernetes",
-            "sql", "mongodb", "postgresql", "tensorflow", "pytorch", "machine learning",
-            "data science", "git", "rest api", "graphql", "ci/cd", "agile", "scrum"
-        ]
+        jd_skill_prompt = f"""Extract ALL technical skills, tools, frameworks, and competencies from this job description.
+
+Job Description:
+{job_description[:3000]}
+
+Return ONLY a JSON array of unique skills.
+Example: ["Python", "AWS", "React", "PostgreSQL", "Docker", "Kubernetes"]
+
+Skills:"""
+
+        jd_response = groq_client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            temperature=0.3,
+            max_tokens=800,
+            messages=[{"role": "user", "content": jd_skill_prompt}],
+        )
         
-        matched = [skill for skill in common_skills if skill in resume_lower and skill in job_lower]
-        missing = [skill for skill in common_skills if skill in job_lower and skill not in resume_lower]
+        jd_content = jd_response.choices[0].message.content.strip()
+        if '```json' in jd_content:
+            jd_content = jd_content.split('```json')[1].split('```')[0]
+        elif '```' in jd_content:
+            jd_content = jd_content.split('```')[1].split('```')[0]
         
-        if len(missing) == 0:
-            score = 85
+        try:
+            job_skills = json.loads(jd_content)
+        except:
+            job_skills = []
+        
+        # ============================================================
+        # STEP 2: Extract skills from Resume using Groq
+        # ============================================================
+        
+        resume_skill_prompt = f"""Extract ALL technical skills, tools, frameworks, and technologies from this resume.
+
+Resume:
+{resume_text[:3000]}
+
+Return ONLY a JSON array of unique skills.
+Example: ["Python", "Django", "AWS", "Docker", "PostgreSQL", "REST APIs"]
+
+Skills:"""
+
+        resume_response = groq_client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            temperature=0.3,
+            max_tokens=800,
+            messages=[{"role": "user", "content": resume_skill_prompt}],
+        )
+        
+        resume_content = resume_response.choices[0].message.content.strip()
+        if '```json' in resume_content:
+            resume_content = resume_content.split('```json')[1].split('```')[0]
+        elif '```' in resume_content:
+            resume_content = resume_content.split('```')[1].split('```')[0]
+        
+        try:
+            resume_skills = json.loads(resume_content)
+        except:
+            resume_skills = []
+        
+        # ============================================================
+        # STEP 3: Match skills
+        # ============================================================
+        
+        resume_skills_lower = [s.lower().strip() for s in resume_skills]
+        job_skills_lower = [s.lower().strip() for s in job_skills]
+        
+        matched_skills = []
+        missing_skills = []
+        
+        for job_skill in job_skills_lower:
+            if job_skill in resume_skills_lower:
+                matched_skills.append(job_skill)
+            else:
+                # Check for partial match
+                found = False
+                for resume_skill in resume_skills_lower:
+                    if job_skill in resume_skill or resume_skill in job_skill:
+                        matched_skills.append(job_skill)
+                        found = True
+                        break
+                if not found:
+                    missing_skills.append(job_skill)
+        
+        matched_skills = list(set(matched_skills))
+        missing_skills = list(set(missing_skills))
+        
+        # ============================================================
+        # STEP 4: Calculate score
+        # ============================================================
+        
+        if job_skills_lower:
+            score = int((len(matched_skills) / len(job_skills_lower)) * 100)
+            score = min(95, max(25, score))
         else:
-            score = max(30, min(85, 85 - (len(missing) * 8)))
+            score = 50
         
-        result = {
-            "final_score": score,
-            "semantic_score": score - 5,
-            "rag_score": score - 3,
-            "skill_score": score - 2,
-            "matched_skills": matched[:10],
-            "missing_skills": missing[:10],
-            "analysis": f"Matched {len(matched)} skills. Missing {len(missing)} skills.",
-            "recommendation": "Good match!" if score > 70 else "Consider adding missing skills.",
-            "method": "Keyword-based matching",
-            "llm_feedback": {
+        if score >= 75:
+            match_level = "Excellent Match"
+            recommendation = "Excellent match! Your skills align very well with the job requirements."
+        elif score >= 55:
+            match_level = "Good Match"
+            recommendation = "Good match. Consider adding the missing skills highlighted below."
+        elif score >= 35:
+            match_level = "Moderate Match"
+            recommendation = "Moderate match. Focus on adding key skills from the job description."
+        else:
+            match_level = "Low Match"
+            recommendation = "Low match. Significant updates needed to align with this role."
+        
+        # ============================================================
+        # STEP 5: Generate feedback using Groq
+        # ============================================================
+        
+        feedback_prompt = f"""Based on the skill analysis, provide helpful feedback.
+
+MATCH SCORE: {score}% ({match_level})
+MATCHED SKILLS: {', '.join(matched_skills[:10]) if matched_skills else 'None'}
+MISSING SKILLS: {', '.join(missing_skills[:10]) if missing_skills else 'None'}
+
+Write a JSON response with:
+1. overall: One sentence about overall fit
+2. strengths: One sentence about what matches well
+3. gaps: One sentence about missing skills
+4. improvements: One sentence with actionable advice
+5. ats_tips: One sentence ATS optimization tip
+
+Return ONLY valid JSON."""
+
+        feedback_response = groq_client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            temperature=0.5,
+            max_tokens=400,
+            messages=[{"role": "user", "content": feedback_prompt}],
+        )
+        
+        feedback_content = feedback_response.choices[0].message.content.strip()
+        if '```json' in feedback_content:
+            feedback_content = feedback_content.split('```json')[1].split('```')[0]
+        elif '```' in feedback_content:
+            feedback_content = feedback_content.split('```')[1].split('```')[0]
+        
+        try:
+            llm_feedback = json.loads(feedback_content)
+        except:
+            llm_feedback = {
                 "overall": f"Your resume matches {score}% of the job requirements.",
-                "strengths": f"You have {len(matched)} relevant skills including {', '.join(matched[:3]) if matched else 'some basic skills'}.",
-                "missing": f"Consider adding: {', '.join(missing[:5]) if missing else 'None - great match!'}",
+                "strengths": f"You have {len(matched_skills)} relevant skills including {', '.join(matched_skills[:3]) if matched_skills else 'some basic skills'}.",
+                "gaps": f"Consider adding: {', '.join(missing_skills[:5]) if missing_skills else 'None - great match!'}",
                 "improvements": "Add more specific examples and metrics to your experience section.",
                 "ats_tips": "Use standard section headings and include keywords from the job description."
             }
-        }
         
-        return JSONResponse(content=result)
+        return JSONResponse(content={
+            "final_score": score,
+            "match_level": match_level,
+            "recommendation": recommendation,
+            "matched_skills": matched_skills[:20],
+            "missing_skills": missing_skills[:20],
+            "resume_skills": resume_skills[:25],
+            "job_skills": job_skills[:25],
+            "analysis": f"Matched {len(matched_skills)} skills out of {len(job_skills_lower)}. Skills extracted dynamically from job description using Groq.",
+            "method": "Dynamic JD Skill Extraction + Groq Analysis (No static skills)",
+            "llm_feedback": llm_feedback
+        })
         
     except Exception as e:
         print(f"Matching error: {e}")
@@ -471,7 +602,8 @@ async def match_resume_ml(
 async def health_check():
     return JSONResponse(content={
         "status": "healthy",
-        "service": "ResumeRise Mock Interview API",
+        "service": "ResumeRise API",
+        "features": ["Mock Interview", "Dynamic Resume Matcher", "Emotion Detection"],
         "timestamp": datetime.now().isoformat()
     })
 
