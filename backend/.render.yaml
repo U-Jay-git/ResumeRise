@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: resumerise-backend
+    runtime: python
+    repo: https://github.com/U-Jay-git/ResumeRise
+    plan: free
+    region: oregon
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    rootDir: backend
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false
